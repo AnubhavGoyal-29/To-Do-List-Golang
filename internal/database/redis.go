@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -18,6 +19,7 @@ func InitRedis() {
 		DB:       0,
 	})
 
+	// Test connection
 	_, err := RedisClient.Ping(Ctx).Result()
 	if err != nil {
 		log.Fatalf("Failed to connect to Redis: %v", err)
@@ -25,3 +27,14 @@ func InitRedis() {
 
 	fmt.Println("Redis connected successfully")
 }
+
+// SetCache - Stores data in Redis with expiration time
+func SetCache(key string, value string, expiration time.Duration) error {
+	return RedisClient.Set(Ctx, key, value, expiration).Err()
+}
+
+// GetCache - Retrieves data from Redis
+func GetCache(key string) (string, error) {
+	return RedisClient.Get(Ctx, key).Result()
+}
+

@@ -1,23 +1,24 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"net/http"
+	"fmt"
+	"log"
 	"ToDoListGolang/internal/database"
 	"ToDoListGolang/internal/models"
+	"ToDoListGolang/routes"
 )
 
 func main() {
+	// Initialize MySQL and Redis
 	database.InitDB()
 	database.InitRedis()
+
+	// Run Auto Migrations
 	database.DB.AutoMigrate(&models.User{})
 	database.DB.AutoMigrate(&models.Task{})
-	r := gin.Default()
+	fmt.Println("Database migrated successfully")
 
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"message": "Welcome to To-Do List API!"})
-	})
-
-	r.Run(":8080")
+	r := routes.RegisterRoutes()
+	log.Fatal(r.Run(":8080"))
 }
 
