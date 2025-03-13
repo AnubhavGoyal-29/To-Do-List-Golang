@@ -12,13 +12,13 @@ func RegisterRoutes() *gin.Engine {
 
     userRoutes := r.Group("/users")
     {
-        userRoutes.POST("/create", usercontroller.CreateUser)
+        userRoutes.POST("/register", usercontroller.CreateUser)
         userRoutes.POST("/login", usercontroller.LoginUser)
     }
 
     protectedUserRoutes := r.Group("/users").Use(middleware.AuthMiddleware())
     {
-        protectedUserRoutes.GET("/profile", usercontroller.GetUser)
+        protectedUserRoutes.GET("/me", usercontroller.GetUser)
         protectedUserRoutes.PUT("/update/:id", usercontroller.UpdateUser)
         protectedUserRoutes.DELETE("/delete/:id", usercontroller.DeleteUser)
         protectedUserRoutes.POST("/logout", usercontroller.LogoutUser)
@@ -26,7 +26,7 @@ func RegisterRoutes() *gin.Engine {
 
     taskRoutes := r.Group("/tasks").Use(middleware.AuthMiddleware())
     {
-        taskRoutes.GET("/", taskcontroller.GetTasks)
+        taskRoutes.GET("", taskcontroller.GetTasks)
         taskRoutes.GET("/:id", taskcontroller.GetTask)
         taskRoutes.POST("/create", taskcontroller.CreateTask)
         taskRoutes.PUT("/update/:id", taskcontroller.UpdateTask)
