@@ -2,10 +2,10 @@ package usercontroller
 
 import (
 	"net/http"
-	"time"
 	"strconv"
 	"ToDoListGolang/internal/database"
 	"ToDoListGolang/internal/models"
+	"ToDoListGolang/internal/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"context"
@@ -49,14 +49,15 @@ func LoginUser(c *gin.Context) {
 		return
 	}
 
-	// Store logged-in user ID in Redis
-	err := database.RedisClient.Set(ctx, "logged_in_user", user.ID, time.Hour).Err()
+	token, err := utils.GenerateJWT(user.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store session"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Login successful", "user_id": user.ID})
+	// Return token
+	c.JSON(http.StatusOK, gin.H{"token": token})
+
 }
 
 func CreateUser(c *gin.Context) {
@@ -82,10 +83,9 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	// Store logged-in user ID in Redis (session creation)
-	err = database.RedisClient.Set(ctx, "logged_in_user", user.ID, time.Hour).Err()
+	token, err := utils.GenerateJWT(user.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store session"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
 		return
 	}
 
@@ -96,6 +96,7 @@ func CreateUser(c *gin.Context) {
 			"id":    user.ID,
 			"name":  user.Name,
 			"email": user.Email,
+			"token": token,
 		},
 	})
 }

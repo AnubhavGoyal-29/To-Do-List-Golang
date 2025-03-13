@@ -2,26 +2,36 @@ package middleware
 
 import (
 	"net/http"
-	"ToDoListGolang/internal/database"
-	"context"
+	"ToDoListGolang/internal/utils"
+
 	"github.com/gin-gonic/gin"
 )
 
-var ctx = context.Background()
-
+// AuthMiddleware validates JWT and extracts user_id
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Get logged-in user from Redis
-		userID, err := database.RedisClient.Get(ctx, "logged_in_user").Result()
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not logged in"})
+		tokenString := c.GetHeader("Authorization")
+		if tokenString == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization token required"})
 			c.Abort()
 			return
 		}
 
-		// Store user ID in context for later use
-		c.Set("userID", userID)
+		// Remove "Bearer " prefix if present
+		if len(tokenString) > 7 && tokenString[:7] == "Bearer " {
+			tokenString = tokenString[7:]
+		}
 
+		// Validate JWT
+		userID, err := utils.ValidateJWT(tokenString)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			c.Abort()
+			return
+		}
+
+		// Store user_id in context
+		c.Set("user_id", userID)
 		c.Next()
 	}
 }
