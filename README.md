@@ -1,6 +1,93 @@
 # To-Do-List-Golang
 A new to do list application in go
 
+# Setup Guide
+
+## **Introduction**
+This guide provides step-by-step instructions to set up and run the To-Do-List-Golang project.
+
+---
+
+## **1. Install Golang(requires 1.18+) (Skip if already installed)**
+First, check if Golang is already installed:
+```sh
+go version
+```
+If it outputs a version (e.g., `go version go1.18 linux/amd64`), you can **skip this step**.
+
+#### **If Golang is not installed, install it using:**
+```sh
+sudo apt update
+sudo apt install -y golang
+```
+
+or manually install a specific version (e.g., **Go 1.20.4**):
+```sh
+wget https://go.dev/dl/go1.20.4.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go
+sudo tar -C /usr/local -xzf go1.20.4.linux-amd64.tar.gz
+echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.bashrc
+source ~/.bashrc
+```
+Then, verify the installation:
+```sh
+go version
+```
+
+---
+
+## **2. Clone the Repository**
+```sh
+git clone https://github.com/AnubhavGoyal-29/To-Do-List-Golang.git
+cd To-Do-List-Golang
+```
+
+---
+
+## **3. Install Dependencies**
+```sh
+go mod tidy
+```
+
+---
+
+## **4. Set Up SQLite Database**
+No external setup is required! The project uses SQLite, and the database file (`task_management.db`) will be automatically created.
+
+To check the database:
+```sh
+sqlite3 task_management.db
+```
+To list tables:
+```sh
+.tables
+```
+
+---
+
+## **5. Run the Server**
+```sh
+go run main.go
+```
+
+The server should start successfully, and you can now use the API endpoints.
+
+---
+
+## **6. Environment Variables (Optional)**
+The project may require environment variables. If needed, create a `.env` file in the project root:
+```sh
+touch .env
+```
+Example `.env` file:
+```sh
+JWT_SECRET=your_secret_key
+PORT=8080
+```
+
+---
+
+
 # API Documentation for To-Do List Microservices
 
 ## **User APIs**
