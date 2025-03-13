@@ -2,7 +2,6 @@ package usercontroller
 
 import (
 	"net/http"
-	"strconv"
 	"ToDoListGolang/internal/database"
 	"ToDoListGolang/internal/models"
 	"ToDoListGolang/internal/utils"
@@ -104,7 +103,7 @@ func CreateUser(c *gin.Context) {
 
 // GetUser - GET /users/:id
 func GetUser(c *gin.Context) {
-	id, _ := strconv.Atoi(c.GetString("userID"))
+	id, _ := c.Get("userID")
 	var user models.User
 
 	if err := database.DB.First(&user, id).Error; err != nil {
