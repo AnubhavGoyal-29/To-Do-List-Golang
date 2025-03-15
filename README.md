@@ -74,17 +74,20 @@ The server should start successfully, and you can now use the API endpoints.
 
 ---
 
-## **6. Environment Variables (Optional)**
+## **6. Environment Variables **
 The project may require environment variables. If needed, create a `.env` file in the project root:
 ```sh
-touch .env
-```
-Example `.env` file:
-```sh
-JWT_SECRET=your_secret_key
-PORT=8080
+openssl rand -base64 32
 ```
 
+```sh
+export JWT_SECRET="your_generated_secret_here"
+```
+
+```sh
+echo 'export JWT_SECRET="your_generated_secret_here"' >> ~/.bashrc
+source ~/.bashrc
+```
 ---
 
 
