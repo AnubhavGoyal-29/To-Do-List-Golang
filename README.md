@@ -112,9 +112,7 @@ PORT=8080
 - **Response:**
   ```json
   {
-    "id": 1,
-    "name": "John Doe",
-    "email": "john@example.com"
+    "userToken" : YOUR_JWT_TOKEN
   }
   ```
 
@@ -156,7 +154,6 @@ PORT=8080
 - **Response:**
   ```json
   {
-    "id": 1,
     "name": "John Doe",
     "email": "john@example.com"
   }
