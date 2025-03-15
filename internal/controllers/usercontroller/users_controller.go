@@ -13,10 +13,13 @@ import (
 var ctx = context.Background()
 
 func LogoutUser(c *gin.Context) {
-	// Delete the session from Redis
-	err := database.RedisClient.Del(ctx, "logged_in_user").Err()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to log out"})
+	userId, _ := c.Get("userID")
+	result := database.DB.Model(&models.UserToken{}).
+		Where("user_id = ? AND is_valid = 1", userId).
+		Update("is_valid", false)
+
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or already logged out token"})
 		return
 	}
 
@@ -53,7 +56,8 @@ func LoginUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
 		return
 	}
-
+	userToken := models.UserToken{UserID: user.ID, Token: token, IsValid: true}
+	database.DB.Create(&userToken)
 	// Return token
 	c.JSON(http.StatusOK, gin.H{"token": token})
 
@@ -88,13 +92,12 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
+	userToken := models.UserToken{UserID: user.ID, Token: token, IsValid: true}
+	database.DB.Create(&userToken)
 	// Return the user object and login success message
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "User registered and logged in successfully",
 		"user": gin.H{
-			"id":    user.ID,
-			"name":  user.Name,
-			"email": user.Email,
 			"token": token,
 		},
 	})
@@ -110,8 +113,15 @@ func GetUser(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
+	response := struct {
+		Name  string `json:"name"`
+		Email string `json:"email"`
+	}{
+		Name:  user.Name,
+		Email: user.Email,
+	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, response)
 }
 
 // UpdateUser - PUT /users/:id

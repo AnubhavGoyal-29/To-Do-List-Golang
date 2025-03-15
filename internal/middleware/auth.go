@@ -3,7 +3,8 @@ package middleware
 import (
 	"net/http"
 	"ToDoListGolang/internal/utils"
-
+	"ToDoListGolang/internal/database"
+	"ToDoListGolang/internal/models"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,6 +27,13 @@ func AuthMiddleware() gin.HandlerFunc {
 		userID, err := utils.ValidateJWT(tokenString)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			c.Abort()
+			return
+		}
+
+		var userToken models.UserToken
+		if err := database.DB.Where("user_id = ? AND token = ? AND is_valid = 1", userID, tokenString).First(&userToken).Error; err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token is invalid"})
 			c.Abort()
 			return
 		}
